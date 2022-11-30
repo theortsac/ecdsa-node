@@ -1,6 +1,6 @@
 import server from "./server";
 
-function Wallet({ address, setAddress, balance, setBalance, setTransactions}) {
+function Transactions({ address, setAddress, transactions, setTransactions, setBalance }) {
   async function onChange(evt) {
     const address = evt.target.value;
     setAddress(address);
@@ -22,16 +22,17 @@ function Wallet({ address, setAddress, balance, setBalance, setTransactions}) {
 
   return (
     <div className="container wallet">
-      <h1>Your Balance</h1>
+      <h1>Your Transactions</h1>
 
       <label>
         Wallet Address
         <input placeholder="Type an address, for example: 0x1" value={address} onChange={onChange}></input>
       </label>
 
-      <div className="balance">Balance: {balance}</div>
+      <div className="balance">Transactions: {transactions}</div>
+      <div className="balance">Next ID: {parseInt(transactions) + 1}</div>
     </div>
   );
 }
 
-export default Wallet;
+export default Transactions;
