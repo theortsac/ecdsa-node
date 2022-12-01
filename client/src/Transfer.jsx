@@ -1,11 +1,24 @@
 import { useState } from "react";
 import server from "./server";
 
-function Transfer({ address, setBalance, recipient, setRecipient, amount, setAmount, setTransactions }) {
+function Transfer({
+  address,
+  setBalance,
+  recipient,
+  setRecipient,
+  amount,
+  setAmount,
+  setTransactions,
+  getSignature,
+}) {
   const [signature, setSignature] = useState("");
   const [recoveryBit, setRecoveryBit] = useState("");
 
-  const setValue = (setter) => (evt) => setter(evt.target.value);
+  const setValue = (setter) => (evt) => {
+    setter(evt.target.value);
+    getSignature();
+    getSignature();
+  };
 
   async function transfer(evt) {
     evt.preventDefault();
@@ -18,7 +31,7 @@ function Transfer({ address, setBalance, recipient, setRecipient, amount, setAmo
         amount: parseInt(amount),
         recipient: recipient,
         signature: String(signature),
-        recoveryBit: String(recoveryBit)
+        recoveryBit: String(recoveryBit),
       });
       setBalance(balance);
       setTransactions(transactions);
@@ -28,7 +41,7 @@ function Transfer({ address, setBalance, recipient, setRecipient, amount, setAmo
   }
 
   return (
-    <form className="container transfer" onSubmit={transfer}>
+    <form className="container wallet" onSubmit={transfer}>
       <h1>Send Transaction</h1>
 
       <label>

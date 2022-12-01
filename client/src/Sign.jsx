@@ -1,39 +1,32 @@
-import { utf8ToBytes, toHex } from "ethereum-cryptography/utils";
-import { keccak256 } from "ethereum-cryptography/keccak";
-import * as secp from '@noble/secp256k1';
-import { useState } from "react";
+export default function Sign({
+  address,
+  recipient,
+  setRecipient,
+  amount,
+  setAmount,
+  onChange,
+  getSignature,
+  signature,
+  recoveryBit,
+  setPrivateKey,
+  privateKey,
+}) {
+  const setValue = (setter) => async (evt) => {
+    await setter(evt.target.value);
+    getSignature();
+  };
 
-function hashMessage(message) {
-    return keccak256(utf8ToBytes(message));
-}
-
-
-export default function Sign({address, setAddress, recipient, setRecipient, amount, setAmount, transactions}) {
-  const [privateKey, setPrivateKey] = useState("");
-  const [signature, setSignature] = useState("");
-  const [recoveryBit, setRecoveryBit] = useState("");
-    const setValue = (setter) => (evt) => {setter(evt.target.value); getSignature()}
-
-    function document() {
-        console.log({sender: address.toLowerCase(), amount: parseInt(amount),  id: parseInt(transactions) + 1, recipient: recipient.toLowerCase()})
-        return hashMessage(JSON.stringify({sender: address.toLowerCase(), amount: parseInt(amount),  id: parseInt(transactions) + 1, recipient: recipient.toLowerCase()}))
-    }
-
-    async function getSignature() {
-        if (address && privateKey && amount && transactions && recipient) {
-            const sig = await secp.sign(document(), privateKey, {recovered: true});
-            setSignature(sig[0].toString());
-            setRecoveryBit(sig[1].toString());
-        }
-    }
-
-  return(
-       <div className="container wallet" >
+  return (
+    <div className="container wallet">
       <h1>Sign Transaction</h1>
 
-    <label>
+      <label>
         Wallet Address
-        <input placeholder="Type an address, for example: 0x1" value={address} onChange={setValue(setAddress)}></input>
+        <input
+          placeholder="Type an address, for example: 0x1"
+          value={address}
+          onChange={onChange}
+        ></input>
       </label>
 
       <label>
@@ -54,20 +47,19 @@ export default function Sign({address, setAddress, recipient, setRecipient, amou
         ></input>
       </label>
 
-            <label>
+      <label>
         Private Key
         <input
           placeholder="Your private key"
           value={privateKey}
+          type="password"
           onChange={setValue(setPrivateKey)}
         ></input>
       </label>
 
-        <div className="balance">Signature: {signature}</div>
-        <br />
-        <div className="balance">Recovery Bit: {recoveryBit}</div>
-
-
+      <div className="balance">Signature: {signature}</div>
+      <br />
+      <div className="balance">Recovery Bit: {recoveryBit}</div>
     </div>
-  )
+  );
 }

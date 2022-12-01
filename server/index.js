@@ -13,19 +13,18 @@ const balances = {
   "0x1": 100,
   "0x2": 50,
   "0x3": 75,
-  "0x16bb6031cbf3a12b899ab99d96b64b7bbd719705": 20
-
+  "0x16bb6031cbf3a12b899ab99d96b64b7bbd719705": 20,
 };
 
 const transactions = {
   "0x1": 4,
   "0x2": 2,
   "0x3": 3,
-  "0x16bb6031cbf3a12b899ab99d96b64b7bbd719705": 1
-}
+  "0x16bb6031cbf3a12b899ab99d96b64b7bbd719705": 1,
+};
 
 function hashMessage(message) {
-    return keccak256(utf8ToBytes(message));
+  return keccak256(utf8ToBytes(message));
 }
 
 function setInitialBalance(address) {
@@ -55,25 +54,35 @@ app.post("/send", (req, res) => {
   setInitialBalance(sender.toLowerCase());
   setInitialBalance(recipient.toLowerCase());
 
-  const document = {sender: sender.toLowerCase(), amount: parseInt(amount), id: parseInt(transactions[sender.toLowerCase()] + 1), recipient: recipient.toLowerCase()}
-  const pkey = secp.recoverPublicKey(hashMessage(JSON.stringify(document)), Uint8Array.from(signature.split(',')), parseInt(recoveryBit));
+  const document = {
+    sender: sender.toLowerCase(),
+    amount: parseInt(amount),
+    id: parseInt(transactions[sender.toLowerCase()] + 1),
+    recipient: recipient.toLowerCase(),
+  };
+  const pkey = secp.recoverPublicKey(
+    hashMessage(JSON.stringify(document)),
+    Uint8Array.from(signature.split(",")),
+    parseInt(recoveryBit)
+  );
   let address = keccak256(pkey.slice(1));
   address = `0x${toHex(address.slice(-20))}`;
-  console.log()
   if (sender.toLowerCase() != address.toLowerCase()) {
-      res.status(400).send({ message: "Wrong signature!" });
-      return;
+    res.status(400).send({ message: "Wrong signature!" });
+    return;
   }
 
   if (balances[sender.toLowerCase()] < amount) {
     res.status(400).send({ message: "Not enough funds!" });
     return;
-
   } else {
     balances[sender.toLowerCase()] -= amount;
     balances[recipient.toLowerCase()] += amount;
     transactions[sender.toLowerCase()]++;
-    res.send({ balance: balances[sender.toLowerCase()], transactions: transactions[sender.toLowerCase()] });
+    res.send({
+      balance: balances[sender.toLowerCase()],
+      transactions: transactions[sender.toLowerCase()],
+    });
     return;
   }
 });
